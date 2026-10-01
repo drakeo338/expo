@@ -1,4 +1,5 @@
 import type { ProjectInfo } from '../../run/ios/XcodeBuild.types';
+import { resolveNativeSchemePropsAsync } from '../../run/ios/options/resolveNativeScheme';
 import { resolveXcodeProject } from '../../run/ios/options/resolveXcodeProject';
 import { CommandError } from '../../utils/errors';
 import type { EnvironmentMode } from '../../utils/nodeEnv';
@@ -11,9 +12,13 @@ export type Options = {
 export type ResolvedOptions = {
   mode: EnvironmentMode;
   xcodeProject: ProjectInfo;
+  scheme: string;
 };
 
-export function resolveOptions(projectRoot: string, options: Options): ResolvedOptions {
+export async function resolveOptionsAsync(
+  projectRoot: string,
+  options: Options
+): Promise<ResolvedOptions> {
   if (options.dev && options.prod) {
     throw new CommandError('BAD_ARGS', 'Specify at most one of: --dev, --prod');
   }
@@ -21,5 +26,12 @@ export function resolveOptions(projectRoot: string, options: Options): ResolvedO
     throw new CommandError('BAD_ARGS', '--prod is not supported yet.');
   }
 
-  return { mode: 'development', xcodeProject: resolveXcodeProject(projectRoot) };
+  const xcodeProject = resolveXcodeProject(projectRoot);
+  const { name: scheme } = await resolveNativeSchemePropsAsync(
+    projectRoot,
+    { configuration: 'Debug' },
+    xcodeProject
+  );
+
+  return { mode: 'development', xcodeProject, scheme };
 }

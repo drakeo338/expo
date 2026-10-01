@@ -10,14 +10,16 @@ jest.mock('../../../utils/nodeEnv.js', () => ({ loadEnvFiles: jest.fn() }), {
 });
 jest.mock('../../../utils/errors', () => ({ logCmdError: jest.fn() }));
 jest.mock('../../../log');
-jest.mock('../resolveOptions.js', () => ({ resolveOptions: jest.fn(() => ({})) }), {
+jest.mock('../resolveOptions.js', () => ({ resolveOptionsAsync: jest.fn(async () => ({})) }), {
   virtual: true,
 });
 
 const { assertArgs } = require('../../../utils/args') as { assertArgs: jest.Mock };
 const { loadEnvFiles } = require('../../../utils/nodeEnv.js') as { loadEnvFiles: jest.Mock };
 const { logCmdError } = require('../../../utils/errors') as { logCmdError: jest.Mock };
-const { resolveOptions } = require('../resolveOptions.js') as { resolveOptions: jest.Mock };
+const { resolveOptionsAsync } = require('../resolveOptions.js') as {
+  resolveOptionsAsync: jest.Mock;
+};
 
 it.each([
   { args: {}, mode: 'development' },
@@ -29,7 +31,7 @@ it.each([
 
   expect(loadEnvFiles).toHaveBeenCalledWith('/app', { mode });
   expect(loadEnvFiles.mock.invocationCallOrder[0]).toBeLessThan(
-    resolveOptions.mock.invocationCallOrder[0]!
+    resolveOptionsAsync.mock.invocationCallOrder[0]!
   );
 });
 

@@ -1,35 +1,40 @@
 import { vol } from 'memfs';
 
-import { resolveOptions } from '../resolveOptions';
+import rnFixture from '../../../prebuild/__tests__/fixtures/react-native-project';
+import { resolveOptionsAsync } from '../resolveOptions';
 
-describe(resolveOptions, () => {
+describe(resolveOptionsAsync, () => {
   afterEach(() => vol.reset());
 
-  it(`defaults to development`, () => {
-    vol.fromJSON({ 'ios/App.xcodeproj': '' }, '/app');
+  it(`defaults to development`, async () => {
+    vol.fromJSON(rnFixture, '/app');
 
-    expect(resolveOptions('/app', {})).toEqual({
+    expect(await resolveOptionsAsync('/app', {})).toEqual({
       mode: 'development',
-      xcodeProject: { name: '/app/ios/App.xcodeproj', isWorkspace: false },
+      xcodeProject: { name: '/app/ios/ReactNativeProject.xcodeproj', isWorkspace: false },
+      scheme: 'ReactNativeProject',
     });
   });
 
-  it(`uses development for --dev`, () => {
-    vol.fromJSON({ 'ios/App.xcodeproj': '' }, '/app');
+  it(`uses development for --dev`, async () => {
+    vol.fromJSON(rnFixture, '/app');
 
-    expect(resolveOptions('/app', { dev: true })).toEqual({
+    expect(await resolveOptionsAsync('/app', { dev: true })).toEqual({
       mode: 'development',
-      xcodeProject: { name: '/app/ios/App.xcodeproj', isWorkspace: false },
+      xcodeProject: { name: '/app/ios/ReactNativeProject.xcodeproj', isWorkspace: false },
+      scheme: 'ReactNativeProject',
     });
   });
 
-  it(`rejects --dev with --prod`, () => {
-    expect(() => resolveOptions('/app', { dev: true, prod: true })).toThrow(
+  it(`rejects --dev with --prod`, async () => {
+    await expect(resolveOptionsAsync('/app', { dev: true, prod: true })).rejects.toThrow(
       'Specify at most one of: --dev, --prod'
     );
   });
 
-  it(`rejects --prod`, () => {
-    expect(() => resolveOptions('/app', { prod: true })).toThrow('--prod is not supported yet.');
+  it(`rejects --prod`, async () => {
+    await expect(resolveOptionsAsync('/app', { prod: true })).rejects.toThrow(
+      '--prod is not supported yet.'
+    );
   });
 });

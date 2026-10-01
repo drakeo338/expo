@@ -39,8 +39,8 @@ export const expoCompileIos: Command = async (argv) => {
       mode: args['--prod'] ? 'production' : 'development',
     });
 
-    const { resolveOptions } = await import('./resolveOptions.js');
-    resolveOptions(projectRoot, {
+    const { resolveOptionsAsync } = await import('./resolveOptions.js');
+    await resolveOptionsAsync(projectRoot, {
       dev: args['--dev'],
       prod: args['--prod'],
     });
