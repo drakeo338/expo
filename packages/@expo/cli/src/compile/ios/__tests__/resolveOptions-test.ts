@@ -1,21 +1,35 @@
+import { vol } from 'memfs';
+
 import { resolveOptions } from '../resolveOptions';
 
 describe(resolveOptions, () => {
+  afterEach(() => vol.reset());
+
   it(`defaults to development`, () => {
-    expect(resolveOptions({})).toEqual({ mode: 'development' });
+    vol.fromJSON({ 'ios/App.xcodeproj': '' }, '/app');
+
+    expect(resolveOptions('/app', {})).toEqual({
+      mode: 'development',
+      xcodeProject: { name: '/app/ios/App.xcodeproj', isWorkspace: false },
+    });
   });
 
   it(`uses development for --dev`, () => {
-    expect(resolveOptions({ dev: true })).toEqual({ mode: 'development' });
+    vol.fromJSON({ 'ios/App.xcodeproj': '' }, '/app');
+
+    expect(resolveOptions('/app', { dev: true })).toEqual({
+      mode: 'development',
+      xcodeProject: { name: '/app/ios/App.xcodeproj', isWorkspace: false },
+    });
   });
 
   it(`rejects --dev with --prod`, () => {
-    expect(() => resolveOptions({ dev: true, prod: true })).toThrow(
+    expect(() => resolveOptions('/app', { dev: true, prod: true })).toThrow(
       'Specify at most one of: --dev, --prod'
     );
   });
 
   it(`rejects --prod`, () => {
-    expect(() => resolveOptions({ prod: true })).toThrow('--prod is not supported yet.');
+    expect(() => resolveOptions('/app', { prod: true })).toThrow('--prod is not supported yet.');
   });
 });

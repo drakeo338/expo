@@ -40,7 +40,7 @@ export const expoCompileIos: Command = async (argv) => {
     });
 
     const { resolveOptions } = await import('./resolveOptions.js');
-    resolveOptions({
+    resolveOptions(projectRoot, {
       dev: args['--dev'],
       prod: args['--prod'],
     });
