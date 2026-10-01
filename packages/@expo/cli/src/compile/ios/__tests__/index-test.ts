@@ -22,8 +22,8 @@ const { resolveOptionsAsync } = require('../resolveOptions.js') as {
 };
 
 it.each([
-  { args: {}, mode: 'development' },
-  { args: { '--prod': true }, mode: 'production' },
+  { args: {}, mode: 'production' },
+  { args: { '--dev': true }, mode: 'development' },
 ])('loads $mode env files before resolving compile:ios options', async ({ args, mode }) => {
   assertArgs.mockReturnValue(args);
 

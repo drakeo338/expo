@@ -41,8 +41,8 @@ it('runs `npx expo compile:ios --help`', async () => {
 
       Options
         <dir>       Directory of the Expo project. Default: Current working directory
-        --dev       Build in development mode (default)
-        --prod      Build in production mode (not available yet)
+        --dev       Build in development mode
+        --prod      Build in production mode (default, not available yet)
         -h, --help  Usage info
     "
   `);

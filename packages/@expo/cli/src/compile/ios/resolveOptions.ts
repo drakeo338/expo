@@ -22,8 +22,11 @@ export async function resolveOptionsAsync(
   if (options.dev && options.prod) {
     throw new CommandError('BAD_ARGS', 'Specify at most one of: --dev, --prod');
   }
-  if (options.prod) {
-    throw new CommandError('BAD_ARGS', '--prod is not supported yet.');
+  if (!options.dev) {
+    throw new CommandError(
+      'BAD_ARGS',
+      'Production builds are not supported yet. Pass --dev to build in development mode.'
+    );
   }
 
   const xcodeProject = resolveXcodeProject(projectRoot);

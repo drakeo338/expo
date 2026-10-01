@@ -25,8 +25,8 @@ export const expoCompileIos: Command = async (argv) => {
       chalk`npx expo compile:ios {dim <dir>}`,
       [
         chalk`<dir>       Directory of the Expo project. {dim Default: Current working directory}`,
-        `--dev       Build in development mode (default)`,
-        `--prod      Build in production mode (not available yet)`,
+        `--dev       Build in development mode`,
+        `--prod      Build in production mode (default, not available yet)`,
         `-h, --help  Usage info`,
       ].join('\n')
     );
@@ -36,7 +36,7 @@ export const expoCompileIos: Command = async (argv) => {
     const projectRoot = getProjectRoot(args);
     const { loadEnvFiles } = await import('../../utils/nodeEnv.js');
     loadEnvFiles(projectRoot, {
-      mode: args['--prod'] ? 'production' : 'development',
+      mode: args['--dev'] ? 'development' : 'production',
     });
 
     const { resolveOptionsAsync } = await import('./resolveOptions.js');

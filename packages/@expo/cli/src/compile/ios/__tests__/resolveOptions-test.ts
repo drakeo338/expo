@@ -6,14 +6,10 @@ import { resolveOptionsAsync } from '../resolveOptions';
 describe(resolveOptionsAsync, () => {
   afterEach(() => vol.reset());
 
-  it(`defaults to development`, async () => {
-    vol.fromJSON(rnFixture, '/app');
-
-    expect(await resolveOptionsAsync('/app', {})).toEqual({
-      mode: 'development',
-      xcodeProject: { name: '/app/ios/ReactNativeProject.xcodeproj', isWorkspace: false },
-      scheme: 'ReactNativeProject',
-    });
+  it(`defaults to production`, async () => {
+    await expect(resolveOptionsAsync('/app', {})).rejects.toThrow(
+      'Production builds are not supported yet. Pass --dev to build in development mode.'
+    );
   });
 
   it(`uses development for --dev`, async () => {
@@ -34,7 +30,7 @@ describe(resolveOptionsAsync, () => {
 
   it(`rejects --prod`, async () => {
     await expect(resolveOptionsAsync('/app', { prod: true })).rejects.toThrow(
-      '--prod is not supported yet.'
+      'Production builds are not supported yet. Pass --dev to build in development mode.'
     );
   });
 });
