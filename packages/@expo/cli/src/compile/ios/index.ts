@@ -26,7 +26,7 @@ export const expoCompileIos: Command = async (argv) => {
       [
         chalk`<dir>       Directory of the Expo project. {dim Default: Current working directory}`,
         `--dev       Build in development mode`,
-        `--prod      Build in production mode (default, not available yet)`,
+        `--prod      Build in production mode (default)`,
         `-h, --help  Usage info`,
       ].join('\n')
     );

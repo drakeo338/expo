@@ -22,10 +22,10 @@ const { resolveOptionsAsync } = require('../resolveOptions.js') as {
 };
 
 it.each([
-  { args: {}, mode: 'production' },
-  { args: { '--dev': true }, mode: 'development' },
-])('loads $mode env files before resolving compile:ios options', async ({ args, mode }) => {
-  assertArgs.mockReturnValue(args);
+  { dev: false, mode: 'production' },
+  { dev: true, mode: 'development' },
+])('loads $mode env files before resolving compile:ios options', async ({ dev, mode }) => {
+  assertArgs.mockReturnValue({ '--dev': dev });
 
   await expoCompileIos([]);
 
@@ -37,7 +37,7 @@ it.each([
 
 it('handles env file errors', async () => {
   const error = new Error('env error');
-  assertArgs.mockReturnValue({});
+  assertArgs.mockReturnValue({ '--dev': false });
   loadEnvFiles.mockImplementationOnce(() => {
     throw error;
   });
