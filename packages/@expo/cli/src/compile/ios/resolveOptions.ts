@@ -1,3 +1,4 @@
+import { hasRequiredIOSFilesAsync } from '../../prebuild/clearNativeFolder';
 import type { ProjectInfo } from '../../run/ios/XcodeBuild.types';
 import { resolveNativeSchemePropsAsync } from '../../run/ios/options/resolveNativeScheme';
 import { resolveXcodeProject } from '../../run/ios/options/resolveXcodeProject';
@@ -30,6 +31,12 @@ export async function resolveOptionsAsync(
   }
 
   const xcodeProject = resolveXcodeProject(projectRoot);
+  if (!(await hasRequiredIOSFilesAsync(projectRoot))) {
+    throw new CommandError(
+      'IOS_MALFORMED',
+      'The ios project is malformed. You can regenerate it with `npx expo prebuild`'
+    );
+  }
   const { name: scheme } = await resolveNativeSchemePropsAsync(
     projectRoot,
     { configuration: 'Debug' },

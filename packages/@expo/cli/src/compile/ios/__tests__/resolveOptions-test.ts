@@ -22,6 +22,14 @@ describe(resolveOptionsAsync, () => {
     });
   });
 
+  it(`rejects a malformed ios project`, async () => {
+    vol.fromJSON({ 'ios/App.xcodeproj': null }, '/app');
+
+    await expect(resolveOptionsAsync('/app', { dev: true })).rejects.toThrow(
+      'The ios project is malformed. You can regenerate it with `npx expo prebuild`'
+    );
+  });
+
   it(`rejects --dev with --prod`, async () => {
     await expect(resolveOptionsAsync('/app', { dev: true, prod: true })).rejects.toThrow(
       'Specify at most one of: --dev, --prod'
