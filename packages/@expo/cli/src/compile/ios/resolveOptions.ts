@@ -1,7 +1,9 @@
 import { hasRequiredIOSFilesAsync } from '../../prebuild/clearNativeFolder';
-import type { ProjectInfo } from '../../run/ios/XcodeBuild.types';
+import type { ProjectInfo, XcodeConfiguration } from '../../run/ios/XcodeBuild.types';
 import { resolveNativeSchemePropsAsync } from '../../run/ios/options/resolveNativeScheme';
 import { resolveXcodeProject } from '../../run/ios/options/resolveXcodeProject';
+import type { OSType } from '../../start/platforms/ios/simctl';
+import { isOSType } from '../../start/platforms/ios/simctl';
 import { CommandError } from '../../utils/errors';
 import type { EnvironmentMode } from '../../utils/nodeEnv';
 
@@ -14,6 +16,8 @@ export type ResolvedOptions = {
   mode: EnvironmentMode;
   xcodeProject: ProjectInfo;
   scheme: string;
+  osType: OSType;
+  configuration: XcodeConfiguration;
 };
 
 export async function resolveOptionsAsync(
@@ -30,6 +34,7 @@ export async function resolveOptionsAsync(
     );
   }
 
+  const configuration: XcodeConfiguration = 'Debug';
   const xcodeProject = resolveXcodeProject(projectRoot);
   if (!(await hasRequiredIOSFilesAsync(projectRoot))) {
     throw new CommandError(
@@ -37,11 +42,18 @@ export async function resolveOptionsAsync(
       'The ios project is malformed. You can regenerate it with `npx expo prebuild`'
     );
   }
-  const { name: scheme } = await resolveNativeSchemePropsAsync(
+  const { osType: schemeOsType, name: scheme } = await resolveNativeSchemePropsAsync(
     projectRoot,
-    { configuration: 'Debug' },
+    { configuration },
     xcodeProject
   );
+  const osType: OSType = isOSType(schemeOsType) ? (schemeOsType as OSType) : 'iOS';
+  if (osType !== 'iOS') {
+    throw new CommandError(
+      'UNSUPPORTED_OS_TYPE',
+      `The ${scheme} scheme builds a ${osType} app. compile:ios only supports iOS apps for now. Use \`npx expo run:ios\` to build it.`
+    );
+  }
 
-  return { mode: 'development', xcodeProject, scheme };
+  return { mode: 'development', xcodeProject, scheme, osType, configuration };
 }
