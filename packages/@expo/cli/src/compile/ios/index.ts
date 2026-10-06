@@ -12,6 +12,7 @@ export const expoCompileIos: Command = async (argv) => {
       '--help': Boolean,
       '--dev': Boolean,
       '--prod': Boolean,
+      '--output-dir': String,
       // Aliases
       '-h': '--help',
     },
@@ -23,10 +24,11 @@ export const expoCompileIos: Command = async (argv) => {
       `Build the iOS app binary locally`,
       chalk`npx expo compile:ios {dim <dir>}`,
       [
-        chalk`<dir>       Directory of the Expo project. {dim Default: Current working directory}`,
-        `--dev       Build in development mode`,
-        `--prod      Build in production mode (default)`,
-        `-h, --help  Usage info`,
+        chalk`<dir>               Directory of the Expo project. {dim Default: Current working directory}`,
+        `--dev               Build in development mode`,
+        `--prod              Build in production mode (default)`,
+        `--output-dir <dir>  Directory to copy the built app to`,
+        `-h, --help          Usage info`,
       ].join('\n')
     );
   }
@@ -42,6 +44,7 @@ export const expoCompileIos: Command = async (argv) => {
     const options = await resolveOptionsAsync(projectRoot, {
       dev: args['--dev'],
       prod: args['--prod'],
+      outputDir: args['--output-dir'],
     });
 
     const { compileIosAsync } = await import('./compileIosAsync.js');

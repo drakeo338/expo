@@ -24,6 +24,14 @@ describe(resolveOptionsAsync, () => {
     });
   });
 
+  it(`resolves --output-dir from the project root`, async () => {
+    vol.fromJSON(rnFixture, '/app');
+
+    expect(await resolveOptionsAsync('/app', { dev: true, outputDir: 'build' })).toMatchObject({
+      outputDir: '/app/build',
+    });
+  });
+
   it(`rejects a non-iOS app`, async () => {
     const pbxprojPath = 'ios/ReactNativeProject.xcodeproj/project.pbxproj';
     vol.fromJSON(

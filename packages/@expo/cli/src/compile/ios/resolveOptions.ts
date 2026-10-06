@@ -1,3 +1,5 @@
+import path from 'path';
+
 import { hasRequiredIOSFilesAsync } from '../../prebuild/clearNativeFolder';
 import type { ProjectInfo, XcodeConfiguration } from '../../run/ios/XcodeBuild.types';
 import { resolveNativeSchemePropsAsync } from '../../run/ios/options/resolveNativeScheme';
@@ -10,6 +12,7 @@ import type { EnvironmentMode } from '../../utils/nodeEnv';
 export type Options = {
   dev?: boolean;
   prod?: boolean;
+  outputDir?: string;
 };
 
 export type ResolvedOptions = {
@@ -18,6 +21,7 @@ export type ResolvedOptions = {
   scheme: string;
   osType: OSType;
   configuration: XcodeConfiguration;
+  outputDir?: string;
 };
 
 export async function resolveOptionsAsync(
@@ -55,5 +59,12 @@ export async function resolveOptionsAsync(
     );
   }
 
-  return { mode: 'development', xcodeProject, scheme, osType, configuration };
+  return {
+    mode: 'development',
+    xcodeProject,
+    scheme,
+    osType,
+    configuration,
+    outputDir: options.outputDir ? path.resolve(projectRoot, options.outputDir) : undefined,
+  };
 }

@@ -1,4 +1,6 @@
 import chalk from 'chalk';
+import fs from 'fs';
+import path from 'path';
 
 import * as Log from '../../log';
 import { event } from '../events';
@@ -21,9 +23,20 @@ export async function compileIosAsync(projectRoot: string, options: ResolvedOpti
     configuration: options.configuration,
   });
 
-  const binaryPath = await getAppPathAsync(options);
+  let binaryPath = await getAppPathAsync(options);
+  if (options.outputDir) {
+    binaryPath = await copyBinaryToOutputAsync(binaryPath, options.outputDir);
+  }
   Log.log(chalk`\n{green ✓} Build complete`);
   Log.log(chalk`{bold Binary:} ${binaryPath}`);
+}
+
+async function copyBinaryToOutputAsync(binaryPath: string, outputDir: string): Promise<string> {
+  const outputPath = path.join(outputDir, path.basename(binaryPath));
+  await fs.promises.mkdir(outputDir, { recursive: true });
+  await fs.promises.cp(binaryPath, outputPath, { recursive: true });
+  Log.log(chalk`{dim Copied to} ${outputPath}`);
+  return outputPath;
 }
 
 function assertPlatform() {

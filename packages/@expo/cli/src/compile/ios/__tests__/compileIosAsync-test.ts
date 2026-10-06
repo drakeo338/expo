@@ -1,9 +1,12 @@
+import fs from 'fs';
+
 import { Log } from '../../../log';
 import { event } from '../../events';
 import { compileIosAsync } from '../compileIosAsync';
 import type { ResolvedOptions } from '../resolveOptions';
 import { buildAsync, getAppPathAsync } from '../xcodebuild';
 
+jest.mock('fs', () => ({ promises: { mkdir: jest.fn(), cp: jest.fn() } }));
 jest.mock('../../../log');
 jest.mock('../xcodebuild');
 jest.mock('../../events', () => {
@@ -55,6 +58,17 @@ describe(compileIosAsync, () => {
       scheme: 'app',
       configuration: 'Debug',
     });
+  });
+
+  it(`copies the app to the output directory`, async () => {
+    mockPlatform('darwin');
+    jest.mocked(getAppPathAsync).mockResolvedValueOnce('/DerivedData/app.app');
+    await compileIosAsync('/app', { ...options, outputDir: '/app/build' });
+    expect(fs.promises.mkdir).toHaveBeenCalledWith('/app/build', { recursive: true });
+    expect(fs.promises.cp).toHaveBeenCalledWith('/DerivedData/app.app', '/app/build/app.app', {
+      recursive: true,
+    });
+    expect(Log.log).toHaveBeenCalledWith(expect.stringContaining('Binary: /app/build/app.app'));
   });
 
   it(`reports a failed build`, async () => {
