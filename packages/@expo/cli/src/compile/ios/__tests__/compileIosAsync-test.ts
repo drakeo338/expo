@@ -2,7 +2,7 @@ import { Log } from '../../../log';
 import { event } from '../../events';
 import { compileIosAsync } from '../compileIosAsync';
 import type { ResolvedOptions } from '../resolveOptions';
-import { buildAsync } from '../xcodebuild';
+import { buildAsync, getAppPathAsync } from '../xcodebuild';
 
 jest.mock('../../../log');
 jest.mock('../xcodebuild');
@@ -45,7 +45,10 @@ describe(compileIosAsync, () => {
 
   it(`builds the app`, async () => {
     mockPlatform('darwin');
+    jest.mocked(getAppPathAsync).mockResolvedValueOnce('/DerivedData/app.app');
     await compileIosAsync('/app', options);
+    expect(Log.log).toHaveBeenCalledWith(expect.stringContaining('Build complete'));
+    expect(Log.log).toHaveBeenCalledWith(expect.stringContaining('Binary: /DerivedData/app.app'));
     expect(buildAsync).toHaveBeenCalledWith(options);
     expect(jest.mocked(event.span).mock.results[0]?.value).toHaveBeenCalledWith('build:done', {
       platform: 'ios',

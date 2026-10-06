@@ -1,4 +1,5 @@
 import spawnAsync from '@expo/spawn-async';
+import path from 'path';
 
 import { CommandError } from '../../utils/errors';
 import type { ResolvedOptions } from './resolveOptions';
@@ -33,4 +34,16 @@ export async function buildAsync(
       `Failed to build iOS project. "xcodebuild" exited with error code ${error.status}.`
     );
   }
+}
+
+export async function getAppPathAsync(
+  props: Pick<ResolvedOptions, 'xcodeProject' | 'configuration' | 'scheme'>
+): Promise<string> {
+  const { stdout } = await spawnAsync('xcodebuild', [
+    ...getXcodeBuildArgs(props),
+    '-showBuildSettings',
+    '-json',
+  ]);
+  const { buildSettings } = JSON.parse(stdout)[0];
+  return path.join(buildSettings.TARGET_BUILD_DIR, buildSettings.WRAPPER_NAME);
 }

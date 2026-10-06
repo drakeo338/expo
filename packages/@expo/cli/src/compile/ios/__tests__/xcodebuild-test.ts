@@ -1,17 +1,17 @@
 import spawnAsync from '@expo/spawn-async';
 
-import { buildAsync } from '../xcodebuild';
+import { buildAsync, getAppPathAsync, getXcodeBuildArgs } from '../xcodebuild';
+
+const props = {
+  configuration: 'Debug' as const,
+  scheme: 'my-app',
+  xcodeProject: {
+    isWorkspace: true,
+    name: 'my-app.xcworkspace',
+  },
+};
 
 describe(buildAsync, () => {
-  const props = {
-    configuration: 'Debug' as const,
-    scheme: 'my-app',
-    xcodeProject: {
-      isWorkspace: true,
-      name: 'my-app.xcworkspace',
-    },
-  };
-
   it(`builds`, async () => {
     await buildAsync(props);
 
@@ -39,5 +39,30 @@ describe(buildAsync, () => {
     await expect(buildAsync(props)).rejects.toThrow(
       'Failed to build iOS project. "xcodebuild" exited with error code 65.'
     );
+  });
+});
+
+describe(getAppPathAsync, () => {
+  it(`returns the built app path`, async () => {
+    jest.mocked(spawnAsync).mockResolvedValueOnce({
+      stdout: JSON.stringify([
+        {
+          target: 'my-app',
+          buildSettings: {
+            TARGET_BUILD_DIR: '/DerivedData/Build/Products/Debug-iphonesimulator',
+            WRAPPER_NAME: 'my-app.app',
+          },
+        },
+      ]),
+    } as any);
+
+    await expect(getAppPathAsync(props)).resolves.toBe(
+      '/DerivedData/Build/Products/Debug-iphonesimulator/my-app.app'
+    );
+    expect(spawnAsync).toHaveBeenCalledWith('xcodebuild', [
+      ...getXcodeBuildArgs(props),
+      '-showBuildSettings',
+      '-json',
+    ]);
   });
 });

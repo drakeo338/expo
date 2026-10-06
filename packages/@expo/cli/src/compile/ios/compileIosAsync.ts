@@ -3,7 +3,7 @@ import chalk from 'chalk';
 import * as Log from '../../log';
 import { event } from '../events';
 import type { ResolvedOptions } from './resolveOptions';
-import { buildAsync } from './xcodebuild';
+import { buildAsync, getAppPathAsync } from './xcodebuild';
 
 export async function compileIosAsync(projectRoot: string, options: ResolvedOptions) {
   assertPlatform();
@@ -20,6 +20,10 @@ export async function compileIosAsync(projectRoot: string, options: ResolvedOpti
     scheme: options.scheme,
     configuration: options.configuration,
   });
+
+  const binaryPath = await getAppPathAsync(options);
+  Log.log(chalk`\n{green ✓} Build complete`);
+  Log.log(chalk`{bold Binary:} ${binaryPath}`);
 }
 
 function assertPlatform() {
