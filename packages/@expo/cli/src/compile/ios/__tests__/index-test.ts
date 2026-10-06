@@ -9,8 +9,10 @@ jest.mock('../../../utils/nodeEnv.js', () => ({ loadEnvFiles: jest.fn() }), {
   virtual: true,
 });
 jest.mock('../../../utils/errors', () => ({ logCmdError: jest.fn() }));
-jest.mock('../../../log');
 jest.mock('../resolveOptions.js', () => ({ resolveOptionsAsync: jest.fn(async () => ({})) }), {
+  virtual: true,
+});
+jest.mock('../compileIosAsync.js', () => ({ compileIosAsync: jest.fn(async () => {}) }), {
   virtual: true,
 });
 
